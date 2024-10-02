@@ -1,55 +1,47 @@
-# Install Streamlit if you haven't already by running: pip install streamlit
+# part2.py
 
 import numpy as np
-import streamlit as st
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
+import streamlit as st
 
-# Title of the Streamlit App
-st.title('Linear Regression Example with Streamlit')
+# Function to perform linear regression and plotting
+def linear_regression():
+    # Step 1: Generate example data
+    np.random.seed(0)  # For reproducibility
+    X = 2 * np.random.rand(100, 1)  # 100 random points between 0 and 2
+    y = 4 + 3 * X + np.random.randn(100, 1)  # y = 3X + 4 + Gaussian noise
 
-# Sidebar for input parameters
-st.sidebar.header('Generate Data for Linear Regression')
+    # Step 2: Prepare the data
+    X_b = np.c_[np.ones((100, 1)), X]  # Add a column of ones for intercept
 
-# Generate Random Data Controls
-n_samples = st.sidebar.slider('Number of Samples', min_value=10, max_value=200, value=100)
-noise_level = st.sidebar.slider('Noise Level', min_value=0.0, max_value=5.0, value=1.0)
+    # Step 3: Compute the optimal values of theta using the Normal Equation
+    theta_best = np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
 
-# Generate random data
-np.random.seed(42)
-X = 2 * np.random.rand(n_samples, 1)
-y = 4 + 3 * X + noise_level * np.random.randn(n_samples, 1)
+    # Step 4: Print the results
+    st.write(f'**Intercept:** {theta_best[0][0]:.2f}')
+    st.write(f'**Slope:** {theta_best[1][0]:.2f}')
 
-# Splitting the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Step 5: Make predictions
+    X_new = np.array([[0], [2]])  # New data points for predictions
+    X_new_b = np.c_[np.ones((2, 1)), X_new]  # Add bias term
+    y_predict = X_new_b.dot(theta_best)
 
-# Creating the Linear Regression model
-model = LinearRegression()
+    # Step 6: Plotting the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(X_new, y_predict, "r-", label="Predictions")  # Line of best fit
+    plt.plot(X, y, "b.", label="Data points")  # Original data points
+    plt.xlabel("X")
+    plt.ylabel("y")
+    plt.title("Linear Regression")
+    plt.legend()
+    st.pyplot(plt)  # Use Streamlit to display the plot
 
-# Training the model
-model.fit(X_train, y_train)
+# Main function to run the app
+def main():
+    st.title("Linear Regression with Streamlit")
+    st.write("This app demonstrates linear regression using generated data.")
+    linear_regression()
 
-# Making predictions on the test set
-y_pred = model.predict(X_test)
-
-# Evaluating the model
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
-
-# Display results
-st.write(f"Mean Squared Error: {mse:.2f}")
-st.write(f"R² Score: {r2:.2f}")
-
-# Plotting the results
-plt.figure(figsize=(8,6))
-plt.scatter(X_test, y_test, color='blue', label='Actual')
-plt.plot(X_test, y_pred, color='red', label='Predicted', linewidth=2)
-plt.title('Linear Regression')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.legend()
-
-# Display the plot in the Streamlit app
-st.pyplot(plt)
+# Entry point of the application
+if __name__ == "__main__":
+    main()

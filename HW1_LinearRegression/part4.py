@@ -1,68 +1,54 @@
-# Install Streamlit and other required packages if you haven't already:
-# pip install streamlit scikit-learn matplotlib
+# part4.py
 
 import numpy as np
-import streamlit as st
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-import pandas as pd
+import streamlit as st
 
-# Streamlit App Title
-st.title('Interactive Linear Regression')
+# Function to perform linear regression and plotting
+def linear_regression(a, c, n):
+    # Step 1: Generate example data
+    X = np.random.rand(n) * 100  # Random X values between 0 and 100
+    y = a * X + 50 + c * np.random.randn(n)  # y = a*x + 50 + noise
 
-# Sidebar controls for user inputs
-st.sidebar.header('Input Parameters')
+    # Step 2: Prepare the data
+    X_b = np.c_[np.ones((n, 1)), X]  # Add a column of ones for intercept
 
-# Slider for 'a' (slope of the line)
-a = st.sidebar.slider('Select the value of a (slope)', min_value=-10.0, max_value=10.0, value=1.0)
+    # Step 3: Compute the optimal values of theta using the Normal Equation
+    theta_best = np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
 
-# Slider for 'c' (noise level)
-c = st.sidebar.slider('Select the value of c (noise level)', min_value=0.0, max_value=100.0, value=10.0)
+    # Step 4: Make predictions
+    X_new = np.array([[0], [100]])  # New data points for predictions
+    X_new_b = np.c_[np.ones((2, 1)), X_new]  # Add bias term
+    y_predict = X_new_b.dot(theta_best)
 
-# Slider for the number of points (n)
-n_points = st.sidebar.slider('Select the number of points (n)', min_value=10, max_value=500, value=100)
+    # Step 5: Plotting the results
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X, y, color='blue', label='Data points')  # Original data points
+    plt.plot(X_new, y_predict, "r-", label="Regression Line")  # Regression line
+    plt.xlabel("X")
+    plt.ylabel("y")
+    plt.title("Linear Regression")
+    plt.legend()
+    st.pyplot(plt)  # Use Streamlit to display the plot
 
-# Generate synthetic data based on user inputs
-np.random.seed(42)
-X = 10 * np.random.rand(n_points, 1)  # Random values of X
-y = a * X + 50 + c * np.random.randn(n_points, 1)  # Linear relationship with noise
+    # Step 6: Show points location
+    st.write("### Data Points Location:")
+    data_points = np.column_stack((X, y))  # Combine X and y into one array for display
+    st.dataframe(data_points)  # Display data points as a DataFrame
 
-# Linear Regression model
-model = LinearRegression()
+# Main function to run the app
+def main():
+    st.title("Linear Regression with Streamlit")
+    st.write("This app demonstrates linear regression with randomly generated data.")
 
-# Fit the model to the data
-model.fit(X, y)
+    # User inputs
+    a = st.slider("Select a (slope)", -10.0, 10.0, 0.0, 0.1)
+    c = st.slider("Select c (noise multiplier)", 0.0, 100.0, 0.0, 1.0)
+    n = st.slider("Select number of points (n)", 10, 500, 100)
 
-# Predict values
-y_pred = model.predict(X)
+    # Automatically run regression on slider change
+    linear_regression(a, c, n)
 
-# Create a DataFrame to store point coordinates for display
-data_points = pd.DataFrame({'X': X.flatten(), 'y (True)': y.flatten(), 'y (Predicted)': y_pred.flatten()})
-
-# Display the table of points
-st.write("Data Points:")
-st.dataframe(data_points)
-
-# Plotting the data points and the regression line
-plt.figure(figsize=(8, 6))
-plt.scatter(X, y, color='blue', label='Data Points')
-plt.plot(X, y_pred, color='red', label='Regression Line', linewidth=2)
-plt.title(f'Linear Regression: y = {a}*x + 50 + c*random noise')
-plt.xlabel('X')
-plt.ylabel('y')
-plt.legend()
-
-# Display the plot in the Streamlit app
-st.pyplot(plt)
-
-# Display the equation of the fitted line
-st.write(f"Equation of the regression line: y = {model.coef_[0][0]:.2f}*x + {model.intercept_[0]:.2f}")
-
-# Optional: Download the data points as CSV file
-csv = data_points.to_csv(index=False)
-st.download_button(
-    label="Download data as CSV",
-    data=csv,
-    file_name='data_points.csv',
-    mime='text/csv',
-)
+# Entry point of the application
+if __name__ == "__main__":
+    main()
