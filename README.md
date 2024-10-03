@@ -1,0 +1,2 @@
+# HW1_LinearRegression
+使用ChatGpt產生Python程式碼以解決LinearRegression問題
