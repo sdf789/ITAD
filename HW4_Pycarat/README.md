@@ -16,3 +16,6 @@ https://medium.com/%E5%B7%A5%E7%A8%8B%E9%9A%A8%E5%AF%AB%E7%AD%86%E8%A8%98/pycare
 程式碼： [HW4_2.ipynb](https://github.com/sdf789/ITAD/blob/main/HW4_Pycarat/HW4_2.ipynb)
 
 使用ChatGPT ： https://chatgpt.com/share/675d364f-f4ec-8005-8e0e-b8441238bdca
+
+![ChatGPT Pycarat](https://github.com/sdf789/ITAD/blob/main/HW4_Pycarat/ChatGPT_Pycarat.png)
+
